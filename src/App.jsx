@@ -3,15 +3,17 @@ import { dishes, deliveryInfo } from "./data";
 import Menu from "./components/Menu";
 import Cart from "./components/Cart";
 import PaymentModal from "./components/PaymentModal";
+import SurpriseMe from "./components/SurpriseMe";
 import "./App.css";
 
 export default function App() {
   const [cart, setCart] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showPayment, setShowPayment] = useState(false);
+  const [showSurprise, setShowSurprise] = useState(false);
 
   function addToCart(dish) {
-    setCart([...cart, { ...dish, quantity: 1 }]);
+    setCart((prev) => [...prev, { ...dish, quantity: 1 }]);
   }
 
   function removeFromCart(id) {
@@ -31,6 +33,9 @@ export default function App() {
             <span className="eta-icon">🛵</span>
             Delivery in {deliveryInfo.etaMin}–{deliveryInfo.etaMax} min
           </span>
+          <button className="surprise-btn" onClick={() => setShowSurprise(true)}>
+            🎲 Surprends-moi
+          </button>
         </div>
         <div className="cart-badge-wrapper">
           <span className="cart-icon">🛒</span>
@@ -52,6 +57,13 @@ export default function App() {
           cart={cart}
           onClose={() => setShowPayment(false)}
           onSuccess={() => { setCart([]); setShowPayment(false); }}
+        />
+      )}
+      {showSurprise && (
+        <SurpriseMe
+          dishes={dishes}
+          onAddToCart={addToCart}
+          onClose={() => setShowSurprise(false)}
         />
       )}
     </div>
