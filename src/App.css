@@ -68,6 +68,27 @@ body {
   50% { opacity: 0.4; }
 }
 
+.surprise-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: white;
+  border: 1.5px solid #00c1b2;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #00c1b2;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.surprise-btn:hover {
+  background: #00c1b2;
+  color: white;
+}
+
 .cart-badge-wrapper {
   position: relative;
   font-size: 1.5rem;
@@ -599,6 +620,48 @@ body {
 .processing-subtitle {
   font-size: 0.8rem;
   color: #9aaba0;
+}
+
+/* Surprise-me */
+.surprise-options {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.option-group-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6b7c71;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+@keyframes dice-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(20deg); }
+}
+
+.surprise-dice {
+  font-size: 2.8rem;
+  line-height: 1;
+  animation: dice-bounce 0.6s ease-in-out infinite;
+}
+
+.surprise-justification {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #6b7c71;
+  margin-bottom: 20px;
+}
+
+.surprise-empty {
+  color: #9aaba0;
+  font-size: 0.95rem;
+  text-align: center;
+  margin: 12px 0 20px;
 }
 
 /* Success */
