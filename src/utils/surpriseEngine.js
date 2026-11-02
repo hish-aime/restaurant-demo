@@ -1,14 +1,14 @@
 export const MOODS = [
   { key: "Léger", emoji: "🥗" },
   { key: "Réconfort", emoji: "🍲" },
-  { key: "Healthy", emoji: "🥦" },
+  { key: "Équilibré", emoji: "🥦" },
   { key: "Gourmand", emoji: "🍫" },
 ];
 
 export const BUDGET_TIERS = [
-  { key: "15-20", label: "15€ – 20€", min: 15, max: 20 },
-  { key: "20-30", label: "20€ – 30€", min: 20, max: 30 },
-  { key: "30+", label: "30€ et plus", min: 30, max: Infinity },
+  { key: "5", label: "Jusqu'à 5 €", max: 5 },
+  { key: "8", label: "Jusqu'à 8 €", max: 8 },
+  { key: "10", label: "Jusqu'à 10 €", max: 10 },
 ];
 
 const LEVELS = [
@@ -34,7 +34,7 @@ function sameIds(combo, ids) {
 function tryLevel(dishes, cats, requireMood, mood, maxBudget, excludeIds) {
   const pools = [];
   for (const cat of cats) {
-    let candidates = dishes.filter((d) => d.category === cat);
+    let candidates = dishes.filter((d) => d.course === cat);
     if (requireMood) candidates = candidates.filter((d) => d.moods.includes(mood));
     if (candidates.length === 0) return null;
     pools.push(candidates);

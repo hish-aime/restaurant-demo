@@ -1,8 +1,19 @@
 import { useState, useEffect } from "react";
+import { optionsLabel } from "../utils/composer";
+import { restaurant } from "../data";
+import DishImage from "./DishImage";
 
 function generateOrderNumber() {
-  return "DL-" + Math.floor(10000 + Math.random() * 90000);
+  return "FC-" + Math.floor(10000 + Math.random() * 90000);
 }
+
+// Demo tracker: each stage lasts a few seconds instead of real kitchen time.
+const TRACK_STEPS = [
+  { label: "Commande reçue", hint: "Le restaurant a bien reçu ta commande." },
+  { label: "En préparation", hint: "Ta commande est en cours de préparation." },
+  { label: "Prête", hint: `C'est prêt ! Passe la récupérer au ${restaurant.address}.` },
+];
+const TRACK_DELAY = 5000;
 
 export default function PaymentModal({ cart, onClose, onSuccess }) {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -14,11 +25,19 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
   const [orderTime] = useState(() => new Date());
   const [form, setForm] = useState({ name: "", number: "", expiry: "", cvv: "" });
 
+  const [trackIndex, setTrackIndex] = useState(0);
+
   useEffect(() => {
     if (step !== "processing") return;
     const timer = setTimeout(() => setStep("success"), 2000);
     return () => clearTimeout(timer);
   }, [step]);
+
+  useEffect(() => {
+    if (step !== "success" || trackIndex >= TRACK_STEPS.length - 1) return;
+    const timer = setTimeout(() => setTrackIndex((i) => i + 1), TRACK_DELAY);
+    return () => clearTimeout(timer);
+  }, [step, trackIndex]);
 
   function handleOverlayClick() {
     if (step !== "processing") onClose();
@@ -42,7 +61,7 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
     form.expiry.length === 5 &&
     form.cvv.length >= 3;
 
-  const formattedTime = orderTime.toLocaleString("en-GB", {
+  const formattedTime = orderTime.toLocaleString("fr-FR", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -56,12 +75,15 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
 
         {step === "summary" && (
           <div className="modal-step">
-            <h2 className="modal-title">Order Summary</h2>
+            <h2 className="modal-title">Récapitulatif de la commande</h2>
             <ul className="modal-item-list">
               {cart.map((item, i) => (
-                <li key={i} className="modal-item-row">
-                  <span className="modal-item-emoji">{item.emoji}</span>
-                  <span className="modal-item-name">{item.name}</span>
+                <li key={item.lineKey ?? i} className="modal-item-row">
+                  <span className="modal-item-art"><DishImage dish={item} /></span>
+                  <span className="modal-item-name">
+                    {item.name}
+                    {item.options?.length > 0 && <small className="modal-item-options">{optionsLabel(item.options)}</small>}
+                  </span>
                   <span className="modal-item-qty">x{item.quantity}</span>
                   <span className="modal-item-price">€{(item.price * item.quantity).toFixed(2)}</span>
                 </li>
@@ -69,19 +91,19 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
             </ul>
             <div className="modal-totals">
               <div className="modal-totals-row">
-                <span>Subtotal</span><span>€{subtotal.toFixed(2)}</span>
+                <span>Sous-total</span><span>€{subtotal.toFixed(2)}</span>
               </div>
               <div className="modal-totals-row">
-                <span>Tax (10%)</span><span>€{tax.toFixed(2)}</span>
+                <span>TVA (10 %)</span><span>€{tax.toFixed(2)}</span>
               </div>
               <div className="modal-totals-row modal-totals-total">
                 <span>Total</span><span>€{total.toFixed(2)}</span>
               </div>
             </div>
             <div className="modal-actions">
-              <button className="modal-btn-secondary" onClick={onClose}>Cancel</button>
+              <button className="modal-btn-secondary" onClick={onClose}>Annuler</button>
               <button className="modal-btn-primary" onClick={() => setStep("card")}>
-                Proceed to Payment
+                Passer au paiement
               </button>
             </div>
           </div>
@@ -89,20 +111,20 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
 
         {step === "card" && (
           <div className="modal-step">
-            <h2 className="modal-title">Payment Details</h2>
+            <h2 className="modal-title">Détails du paiement</h2>
             <div className="card-form">
               <label className="card-label">
-                Name on card
+                Nom sur la carte
                 <input
                   className="card-input"
                   type="text"
-                  placeholder="Jane Smith"
+                  placeholder="Jean Dupont"
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 />
               </label>
               <label className="card-label">
-                Card number
+                Numéro de carte
                 <input
                   className="card-input"
                   type="text"
@@ -114,12 +136,12 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
               </label>
               <div className="card-row">
                 <label className="card-label">
-                  Expiry
+                  Expiration
                   <input
                     className="card-input"
                     type="text"
                     inputMode="numeric"
-                    placeholder="MM/YY"
+                    placeholder="MM/AA"
                     value={form.expiry}
                     onChange={handleExpiryChange}
                   />
@@ -139,13 +161,13 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
               </div>
             </div>
             <div className="modal-actions">
-              <button className="modal-btn-secondary" onClick={() => setStep("summary")}>Back</button>
+              <button className="modal-btn-secondary" onClick={() => setStep("summary")}>Retour</button>
               <button
                 className="modal-btn-primary"
                 disabled={!canPay}
                 onClick={() => setStep("processing")}
               >
-                Pay €{total.toFixed(2)}
+                Payer €{total.toFixed(2)}
               </button>
             </div>
           </div>
@@ -154,21 +176,37 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
         {step === "processing" && (
           <div className="modal-step modal-step-centered">
             <div className="spinner" />
-            <p className="processing-title">Processing your payment…</p>
-            <p className="processing-subtitle">Please do not close this window.</p>
+            <p className="processing-title">Paiement en cours…</p>
+            <p className="processing-subtitle">Merci de ne pas fermer cette fenêtre.</p>
           </div>
         )}
 
         {step === "success" && (
           <div className="modal-step modal-step-centered">
             <div className="success-icon">✓</div>
-            <h2 className="success-title">Payment Successful!</h2>
-            <p className="success-meta">Order {orderNumber} · {formattedTime}</p>
+            <h2 className="success-title">Paiement réussi !</h2>
+            <p className="success-meta">Commande {orderNumber} · {formattedTime}</p>
+            <ol className="tracker" aria-label="Suivi de commande">
+              {TRACK_STEPS.map((s, i) => (
+                <li
+                  key={s.label}
+                  className={`tracker-step ${i < trackIndex ? "done" : ""} ${i === trackIndex ? "current" : ""}`}
+                  aria-current={i === trackIndex ? "step" : undefined}
+                >
+                  <span className="tracker-dot">{i < trackIndex ? "✓" : i + 1}</span>
+                  <span className="tracker-label">{s.label}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="tracker-hint" role="status">{TRACK_STEPS[trackIndex].hint}</p>
             <ul className="modal-item-list modal-item-list--receipt">
               {cart.map((item, i) => (
-                <li key={i} className="modal-item-row">
-                  <span className="modal-item-emoji">{item.emoji}</span>
-                  <span className="modal-item-name">{item.name}</span>
+                <li key={item.lineKey ?? i} className="modal-item-row">
+                  <span className="modal-item-art"><DishImage dish={item} /></span>
+                  <span className="modal-item-name">
+                    {item.name}
+                    {item.options?.length > 0 && <small className="modal-item-options">{optionsLabel(item.options)}</small>}
+                  </span>
                   <span className="modal-item-qty">x{item.quantity}</span>
                   <span className="modal-item-price">€{(item.price * item.quantity).toFixed(2)}</span>
                 </li>
@@ -176,11 +214,11 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
             </ul>
             <div className="modal-totals">
               <div className="modal-totals-row modal-totals-total">
-                <span>Total paid</span><span>€{total.toFixed(2)}</span>
+                <span>Total payé</span><span>€{total.toFixed(2)}</span>
               </div>
             </div>
             <button className="modal-btn-primary modal-btn-full" onClick={onSuccess}>
-              Start New Order
+              Nouvelle commande
             </button>
           </div>
         )}

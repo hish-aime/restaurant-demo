@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { MOODS, BUDGET_TIERS, pickCombo } from "../utils/surpriseEngine";
+import { cheapestSelection, computeOptions } from "../utils/composer";
 
 export default function SurpriseMe({ dishes, onAddToCart, onClose }) {
   const [step, setStep] = useState("config");
@@ -30,7 +31,7 @@ export default function SurpriseMe({ dishes, onAddToCart, onClose }) {
   }
 
   function handleAddToCart() {
-    combo.items.forEach((dish) => onAddToCart(dish));
+    combo.items.forEach((dish) => onAddToCart(dish, computeOptions(dish, cheapestSelection(dish))));
     onClose();
   }
 

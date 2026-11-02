@@ -1,53 +1,97 @@
 import { useState } from "react";
-import { dishes, deliveryInfo } from "./data";
+import { dishes, HOME, MENUS } from "./data";
 import Menu from "./components/Menu";
 import Cart from "./components/Cart";
 import PaymentModal from "./components/PaymentModal";
 import SurpriseMe from "./components/SurpriseMe";
+import ItemComposer from "./components/ItemComposer";
+import OpenStatus from "./components/OpenStatus";
+import SearchOverlay from "./components/SearchOverlay";
+import BottomNav from "./components/BottomNav";
+import { makeLineKey, unitPrice } from "./utils/composer";
+import { useTheme } from "./utils/useTheme";
 import "./App.css";
 
 export default function App() {
   const [cart, setCart] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(HOME);
   const [showPayment, setShowPayment] = useState(false);
   const [showSurprise, setShowSurprise] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [composing, setComposing] = useState(null);
+  const [theme, toggleTheme] = useTheme();
 
-  function addToCart(dish) {
+  function addToCart(dish, options = []) {
+    const lineKey = makeLineKey(dish.id, options);
     setCart((prev) => {
-      const existing = prev.find((item) => item.id === dish.id);
+      const existing = prev.find((item) => item.lineKey === lineKey);
       if (existing) {
         return prev.map((item) =>
-          item.id === dish.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.lineKey === lineKey ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { ...dish, quantity: 1 }];
+      return [
+        ...prev,
+        { ...dish, lineKey, options, basePrice: dish.price, price: unitPrice(dish.price, options), quantity: 1 },
+      ];
     });
   }
 
-  function removeFromCart(id) {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  function pickDish(dish) {
+    if (dish.groups.length > 0) setComposing(dish);
+    else addToCart(dish);
   }
 
-  const cartCount = cart.length;
+  function changeQuantity(lineKey, delta) {
+    setCart((prev) =>
+      prev
+        .map((item) => (item.lineKey === lineKey ? { ...item, quantity: item.quantity + delta } : item))
+        .filter((item) => item.quantity > 0)
+    );
+  }
+
+  function goTo(tab) {
+    setSelectedCategory(tab);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <div className="app">
       <header className="app-header">
-        <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
-          <img src={`${import.meta.env.BASE_URL}deliveroo-logo.png`} alt="Deliveroo" height="36" />
-          <h1>roo<span style={{color:"#1a271f"}}>food</span></h1>
-          <span className="delivery-eta">
-            <span className="eta-dot" />
-            <span className="eta-icon">🛵</span>
-            Delivery in {deliveryInfo.etaMin}–{deliveryInfo.etaMax} min
-          </span>
-          <button className="surprise-btn" onClick={() => setShowSurprise(true)}>
-            🎲 Surprends-moi
-          </button>
+        <div className="header-left">
+          <h1 className="brand">
+            <span className="brand-mark" aria-hidden="true">🥖</span>
+            Le fournil
+          </h1>
+          <OpenStatus />
         </div>
-        <div className="cart-badge-wrapper">
-          <span className="cart-icon">🛒</span>
-          {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+        <div className="header-actions">
+          <button className="header-search" onClick={() => setShowSearch(true)} aria-label="Rechercher un produit">
+            <span aria-hidden="true">🔍</span>
+            <span className="header-search-label">Rechercher un produit…</span>
+          </button>
+          <button className="surprise-btn" onClick={() => setShowSurprise(true)}>
+            🎲 <span className="surprise-btn-label">Surprends-moi</span>
+          </button>
+          <button
+            className="icon-btn theme-btn"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Passer au thème clair" : "Passer au thème sombre"}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+          <button
+            className="cart-badge-wrapper"
+            aria-label="Ouvrir le panier"
+            onClick={() => setShowCart(true)}
+          >
+            <span className="cart-icon">🛒</span>
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+          </button>
         </div>
       </header>
 
@@ -56,10 +100,46 @@ export default function App() {
           dishes={dishes}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
-          onAddToCart={addToCart}
+          onPickDish={pickDish}
+          onSurprise={() => setShowSurprise(true)}
         />
-        <Cart cart={cart} onRemove={removeFromCart} onCheckout={() => setShowPayment(true)} />
+        <Cart
+          cart={cart}
+          open={showCart}
+          onClose={() => setShowCart(false)}
+          onChangeQuantity={changeQuantity}
+          onPickDish={pickDish}
+          onCheckout={() => { setShowCart(false); setShowPayment(true); }}
+        />
       </main>
+
+      {showCart && <div className="cart-backdrop" onClick={() => setShowCart(false)} />}
+
+      <BottomNav
+        selected={selectedCategory}
+        onHome={() => goTo(HOME)}
+        onMenus={() => goTo(MENUS)}
+        onSearch={() => setShowSearch(true)}
+        onCart={() => setShowCart(true)}
+        cartCount={cartCount}
+        cartTotal={cartSubtotal}
+      />
+
+      {showSearch && (
+        <SearchOverlay
+          dishes={dishes}
+          onPickDish={(dish) => { setShowSearch(false); pickDish(dish); }}
+          onClose={() => setShowSearch(false)}
+        />
+      )}
+      {composing && (
+        <ItemComposer
+          key={composing.id}
+          item={composing}
+          onClose={() => setComposing(null)}
+          onAdd={(dish, options) => { addToCart(dish, options); setComposing(null); }}
+        />
+      )}
       {showPayment && (
         <PaymentModal
           cart={cart}

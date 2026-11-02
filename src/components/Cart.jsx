@@ -1,38 +1,78 @@
-export default function Cart({ cart, onRemove, onCheckout }) {
+import { optionsLabel } from "../utils/composer";
+import { suggestionsFor } from "../utils/suggestions";
+import DishImage from "./DishImage";
+
+export default function Cart({ cart, open, onClose, onChangeQuantity, onPickDish, onCheckout }) {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const tax = subtotal * 0.10;
   const total = subtotal + tax;
+  const suggestions = suggestionsFor(cart);
 
   return (
-    <aside className="cart">
-      <h2>Your Order</h2>
+    <aside className={`cart ${open ? "cart--open" : ""}`}>
+      <div className="cart-header">
+        <h2>Ma commande</h2>
+        <button className="cart-close" aria-label="Fermer le panier" onClick={onClose}>✕</button>
+      </div>
 
       {cart.length === 0 ? (
-        <p className="cart-empty">No items yet.</p>
+        <p className="cart-empty">
+          <span aria-hidden="true">🛒</span>
+          Ton panier est vide pour l'instant.
+        </p>
       ) : (
         <ul className="cart-list">
-          {cart.map((item, index) => (
-            <li key={index} className="cart-item">
-              <span className="cart-item-emoji">{item.emoji}</span>
+          {cart.map((item) => (
+            <li key={item.lineKey} className="cart-item">
+              <span className="cart-item-art"><DishImage dish={item} /></span>
               <div className="cart-item-details">
                 <span className="cart-item-name">{item.name}</span>
-                <span className="cart-item-qty">x{item.quantity}</span>
+                {item.options?.length > 0 && (
+                  <span className="cart-item-options">{optionsLabel(item.options)}</span>
+                )}
+                <span className="qty">
+                  <button
+                    aria-label={item.quantity === 1 ? `Retirer ${item.name}` : `Moins de ${item.name}`}
+                    onClick={() => onChangeQuantity(item.lineKey, -1)}
+                  >
+                    {item.quantity === 1 ? "🗑" : "−"}
+                  </button>
+                  <span aria-label={`Quantité : ${item.quantity}`}>{item.quantity}</span>
+                  <button aria-label={`Plus de ${item.name}`} onClick={() => onChangeQuantity(item.lineKey, 1)}>+</button>
+                </span>
               </div>
               <span className="cart-item-price">€{(item.price * item.quantity).toFixed(2)}</span>
-              <button className="remove-btn" onClick={() => onRemove(item.id)}>✕</button>
             </li>
           ))}
         </ul>
       )}
 
+      {suggestions.length > 0 && (
+        <div className="cart-suggest">
+          <p className="cart-suggest-title">Tu aimeras aussi</p>
+          <ul>
+            {suggestions.map((dish) => (
+              <li key={dish.id}>
+                <button className="suggest-card" onClick={() => onPickDish(dish)}>
+                  <span className="suggest-art"><DishImage dish={dish} /></span>
+                  <span className="suggest-name">{dish.name}</span>
+                  <span className="suggest-price">€{dish.price.toFixed(2)}</span>
+                  <span className="suggest-add" aria-hidden="true">+</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="cart-totals">
         <div className="cart-totals-row">
-          <span>Subtotal</span>
+          <span>Sous-total</span>
           <span>€{subtotal.toFixed(2)}</span>
         </div>
         <div className="cart-totals-row">
-          <span>Tax (10%)</span>
+          <span>TVA (10 %)</span>
           <span>€{tax.toFixed(2)}</span>
         </div>
         <div className="cart-totals-row total">
@@ -46,7 +86,7 @@ export default function Cart({ cart, onRemove, onCheckout }) {
         disabled={cart.length === 0}
         onClick={onCheckout}
       >
-        Place Order
+        Commander
       </button>
     </aside>
   );
