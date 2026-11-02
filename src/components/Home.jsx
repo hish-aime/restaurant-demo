@@ -9,6 +9,7 @@ import {
   restaurant,
   shareOffers,
 } from "../data";
+import { heroBottle, heroBucket } from "../photos";
 import DishImage from "./DishImage";
 
 // [from, to] gradient of each category tile, cycled in menu order
@@ -22,7 +23,8 @@ const TINTS = [
 ];
 
 const byName = Object.fromEntries(dishes.map((d) => [d.name, d]));
-const HERO_PHOTOS = ["Box Family", "Menu Giant", "Frites"].map((n) => byName[n]).filter((d) => d?.photo);
+// bucket, burger, fries, bottle: the numbers match the .home-hero-photo--N positions in the CSS
+const HERO_PHOTOS = [heroBucket, byName["Menu Giant"]?.photo, byName.Frites?.photo, heroBottle];
 
 function Row({ row, ranked, onPick }) {
   const scroller = useRef(null);
@@ -84,9 +86,9 @@ export default function Home({ onPickDish, onGoMenus, onGoCategory, onSurprise }
           </div>
         </div>
         <div className="home-hero-art" aria-hidden="true">
-          {HERO_PHOTOS.map((dish, i) => (
-            <img key={dish.id} className={`home-hero-photo home-hero-photo--${i + 1}`} src={dish.photo} alt="" />
-          ))}
+          {HERO_PHOTOS.map(
+            (src, i) => src && <img key={i} className={`home-hero-photo home-hero-photo--${i + 1}`} src={src} alt="" />
+          )}
         </div>
       </section>
 

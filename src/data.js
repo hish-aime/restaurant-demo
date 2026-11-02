@@ -31,7 +31,7 @@ export const restaurant = {
   service: "Sur place · À emporter",
 };
 
-// course: role in the "Surprends-moi" combo (Starters / Mains / Desserts), null = never suggested.
+// course: role in "Surprends-moi": Mains = a meal is built around it, Desserts = suggested as a treat, null = never suggested.
 // moods: tags used by the "Surprends-moi" generator.
 const MENU = [
   { category: "Buckets", emoji: "🍗", course: "Mains", moods: ["Gourmand", "Réconfort"], items: [
@@ -64,7 +64,7 @@ const MENU = [
     ["Tasty crousty", 7, "Bol de riz garni de nuggets ou de tenders croustillants, nappé de sauce : 1 sauce en M, 2 en L, 3 en XL. Viande halal."],
   ] },
   { category: "Menu Enfant", emoji: "🧒", course: "Mains", moods: ["Léger", "Réconfort"], items: [
-    ["Menu Fournil Enfant", 6, "Petite frite, un Ptit'Cheese ou 4 nuggets, et un Capri-Sun ou une Pom'Potes. Viande halal."],
+    ["Menu Fournil Enfant", 6, "Petite frite, un Ptit'Cheese ou 4 nuggets, et un Capri-Sun ou une Pom'Potes. Viande halal.", undefined, undefined, null],
   ] },
   { category: "Les paninis", emoji: "🥖", course: "Mains", moods: ["Réconfort"], note: "Seul ou en menu (+2 €) avec canette et viennoiserie", items: [
     ["Panini", 4.5, "Panini grillé, garniture au choix : merguez, 3 fromages, poulet mariné, kebab, dinde, viande hachée ou jambon de poulet. Viande halal."],

@@ -44,8 +44,21 @@ export function pruneSelection(item, sel) {
   return next;
 }
 
-// Cheapest valid selection: first option(s) of every mandatory group.
+// Builds a selection group by group, in the order the composer shows them.
+// choose(group, sel) returns { [optionName]: count } for that group, or nothing to leave it empty.
 // Only for flows where the customer makes no choice themselves (Surprends-moi); the composer starts empty.
+export function buildSelection(item, choose) {
+  let sel = {};
+  for (const ref of item.groups.map(toRef)) {
+    if (ref.requires && !(sel[ref.requires.group]?.[ref.requires.option] > 0)) continue;
+    const def = GROUPS[ref.id];
+    const chosen = choose({ id: ref.id, def, ...limits(def, sel) }, sel);
+    if (chosen && Object.keys(chosen).length > 0) sel = { ...sel, [ref.id]: chosen };
+  }
+  return sel;
+}
+
+// Cheapest valid selection: first option(s) of every mandatory group.
 export function cheapestSelection(item) {
   let sel = {};
   for (const ref of item.groups.map(toRef)) {

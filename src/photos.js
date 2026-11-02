@@ -60,3 +60,7 @@ const INGREDIENTS = {
 
 export const photoOf = (dishName) => (PRODUCTS[dishName] ? file(PRODUCTS[dishName]) : null);
 export const ingredientPhoto = (optionName) => (INGREDIENTS[optionName] ? file(INGREDIENTS[optionName]) : null);
+
+// Home hero: the family bucket without its side dishes, and the bottle on its own
+export const heroBucket = file("hero-bucket.webp");
+export const heroBottle = file("hero-bottle.webp");
