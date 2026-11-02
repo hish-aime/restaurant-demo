@@ -18,12 +18,14 @@ export default function App() {
   const [showPayment, setShowPayment] = useState(false);
   const [showSurprise, setShowSurprise] = useState(false);
   const [showCart, setShowCart] = useState(false);
+  const [cartCollapsed, setCartCollapsed] = useState(false); // desktop: sidebar hidden by its close button
   const [showSearch, setShowSearch] = useState(false);
   const [composing, setComposing] = useState(null);
   const [theme, toggleTheme] = useTheme();
 
   function addToCart(dish, options = []) {
     const lineKey = makeLineKey(dish.id, options);
+    setCartCollapsed(false);
     setCart((prev) => {
       const existing = prev.find((item) => item.lineKey === lineKey);
       if (existing) {
@@ -51,6 +53,21 @@ export default function App() {
         .map((item) => (item.lineKey === lineKey ? { ...item, quantity: item.quantity + delta } : item))
         .filter((item) => item.quantity > 0)
     );
+  }
+
+  function openCart() {
+    setCartCollapsed(false);
+    setShowCart(true);
+  }
+
+  function closeCart() {
+    setCartCollapsed(true);
+    setShowCart(false);
+  }
+
+  function cancelOrder() {
+    setCart([]);
+    setShowCart(false);
   }
 
   function goTo(tab) {
@@ -95,7 +112,7 @@ export default function App() {
           <button
             className="cart-badge-wrapper"
             aria-label="Ouvrir le panier"
-            onClick={() => setShowCart(true)}
+            onClick={openCart}
           >
             <span className="cart-icon">🛒</span>
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
@@ -103,7 +120,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="app-main">
+      <main className={`app-main ${cartCollapsed ? "app-main--cart-collapsed" : ""}`}>
         <Menu
           dishes={dishes}
           selectedCategory={selectedCategory}
@@ -114,7 +131,8 @@ export default function App() {
         <Cart
           cart={cart}
           open={showCart}
-          onClose={() => setShowCart(false)}
+          onClose={closeCart}
+          onCancel={cancelOrder}
           onChangeQuantity={changeQuantity}
           onPickDish={pickDish}
           onCheckout={() => { setShowCart(false); setShowPayment(true); }}

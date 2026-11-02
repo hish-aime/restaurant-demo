@@ -2,7 +2,7 @@ import { optionsLabel } from "../utils/composer";
 import { suggestionsFor } from "../utils/suggestions";
 import DishImage from "./DishImage";
 
-export default function Cart({ cart, open, onClose, onChangeQuantity, onPickDish, onCheckout }) {
+export default function Cart({ cart, open, onClose, onCancel, onChangeQuantity, onPickDish, onCheckout }) {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const tax = subtotal * 0.10;
@@ -17,7 +17,7 @@ export default function Cart({ cart, open, onClose, onChangeQuantity, onPickDish
           Ma commande
           {cart.length > 0 && <small className="cart-header-count">{count} article{count > 1 ? "s" : ""}</small>}
         </h2>
-        <button className="cart-close" aria-label="Fermer le panier" onClick={onClose}>✕</button>
+        <button className="cart-close" aria-label="Fermer le panier" title="Fermer" onClick={onClose}>✕</button>
       </div>
 
       <div className="cart-body">
@@ -89,13 +89,18 @@ export default function Cart({ cart, open, onClose, onChangeQuantity, onPickDish
         </div>
       </div>
 
-      <button
-        className="checkout-btn"
-        disabled={cart.length === 0}
-        onClick={onCheckout}
-      >
-        Commander
-      </button>
+      <div className="cart-actions">
+        <button className="cancel-btn" disabled={cart.length === 0} onClick={onCancel}>
+          Annuler
+        </button>
+        <button
+          className="checkout-btn"
+          disabled={cart.length === 0}
+          onClick={onCheckout}
+        >
+          Commander
+        </button>
+      </div>
       </div>
     </aside>
   );

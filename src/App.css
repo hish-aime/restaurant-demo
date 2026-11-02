@@ -3198,3 +3198,47 @@ button.cart-badge-wrapper:hover { background: var(--brand-hover); }
 @media (max-width: 768px) {
   .bottom-nav { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ─── Panier : annuler la commande / fermer le panneau ───── */
+.cart-actions { display: flex; gap: 10px; }
+.cart-actions .checkout-btn { flex: 1; width: auto; min-width: 0; }
+.cancel-btn {
+  flex: none;
+  padding: 15px 20px;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.cancel-btn:hover:not(:disabled) { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
+.cancel-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* desktop: the close button hides the sidebar, the header cart button brings it back */
+@media (min-width: 1025px) {
+  .cart-close {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .cart-close:hover { background: var(--brand-soft); border-color: var(--brand); color: var(--brand); }
+  .app-main--cart-collapsed .cart { display: none; }
+}
+
+@media (max-width: 1024px) {
+  .cart-actions .checkout-btn { padding: 13px; }
+  .cancel-btn { padding: 13px 18px; }
+}
