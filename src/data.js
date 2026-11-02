@@ -22,7 +22,7 @@ export const hoursSummary = [
 
 // Contact details as printed on the shop's flyer.
 export const restaurant = {
-  name: "Le Fournil de Chantilly",
+  name: "Le Fournil",
   tagline: "Burgers, tacos, paninis & desserts · Viande halal",
   slogan: "Le snack de votre quartier",
   address: "5 av. de Sylvie, 60500 Chantilly",

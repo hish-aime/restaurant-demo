@@ -43,6 +43,9 @@ const PRODUCTS = {
   "Tiramisu chocolat noisette spéculoos": "dessert-tiramisu.webp",
   "Tarte au Daim": "dessert-tarte-daim.webp",
   "Éclair au chocolat": "dessert-eclairchoco.webp",
+  "Crêpe": "dessert-crepe.webp",
+  "Milkshake": "milkshake-nutella.webp",
+  "Menu sandwich country chicken": "burger-country-chicken.webp",
 };
 
 // Thumbnails of the tacos / crousty meat choices

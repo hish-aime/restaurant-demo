@@ -1,4 +1,4 @@
-// Option groups ("personnalisations") of Le Fournil de Chantilly, ported from the Uber Eats Manager sheet.
+// Option groups ("personnalisations") of Le Fournil, ported from the Uber Eats Manager sheet.
 // min/max = number of choices the customer must make. repeat = the same option may be picked several times.
 // limitBy = the max depends on another group's selection (e.g. number of included sauces depends on the size).
 // included = free choices "jusqu'à max" (never forced); paid extras live in their own group ("sauce-sup").
