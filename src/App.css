@@ -3047,3 +3047,154 @@ button.cart-badge-wrapper:hover { background: var(--brand-hover); }
   background: none;
 }
 .extra-chip-plus { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 1.2rem; font-weight: 800; }
+
+/* ─── Panier : bulle + fenêtre de tchat (téléphones et tablettes) ───── */
+.cart-fab { display: none; }
+.cart-body, .cart-footer { display: contents; }
+.cart-header-count { display: block; margin-top: 2px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0; color: var(--muted); }
+
+@keyframes fab-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes chat-open {
+  from { opacity: 0; transform: translateY(14px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 1024px) {
+  /* the sidebar makes room: the cart no longer takes a column */
+  .app-main { flex-direction: column; min-height: calc(100vh - 56px); }
+  .app-header .cart-badge-wrapper { display: none; }
+
+  .cart-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    z-index: 55;
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    border: none;
+    border-radius: 50%;
+    background: var(--brand);
+    color: var(--on-brand);
+    font-size: 1.65rem;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+    animation: fab-pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+    transition: background 0.15s;
+  }
+
+  .cart-fab:hover { background: var(--brand-hover); }
+
+  .cart-fab-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    display: grid;
+    place-items: center;
+    min-width: 25px;
+    height: 25px;
+    padding: 0 6px;
+    border: 2px solid var(--bg);
+    border-radius: 13px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  /* the cart window: a chat widget anchored to the bubble */
+  .cart {
+    position: fixed;
+    top: auto;
+    left: auto;
+    right: 12px;
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: min(390px, calc(100vw - 24px));
+    height: auto;
+    max-height: calc(100dvh - 84px - 72px - env(safe-area-inset-bottom, 0px));
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    transform-origin: bottom right;
+    transform: translateY(14px) scale(0.92);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s;
+  }
+
+  .cart--open { transform: none; opacity: 1; visibility: visible; }
+
+  .cart-header {
+    flex: none;
+    padding: 14px 16px;
+    background: var(--brand);
+    color: var(--on-brand);
+  }
+
+  .cart-header h2 { color: var(--on-brand); font-size: 1.15rem; }
+  .cart-header .cart-header-count { color: rgba(255, 255, 255, 0.85); }
+
+  .cart-close {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--on-brand);
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .cart-close:hover { background: rgba(255, 255, 255, 0.32); }
+
+  .cart-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 16px;
+    overflow-y: auto;
+  }
+
+  .cart-footer {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .cart-footer .cart-totals { margin-top: 0; padding-top: 0; border-top: none; gap: 6px; }
+  .cart-footer .checkout-btn { padding: 13px; }
+
+  .cart-backdrop { display: block; position: fixed; inset: 0; z-index: 55; background: rgba(42, 26, 18, 0.28); }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cart-fab { bottom: 24px; right: 24px; }
+  .cart { bottom: 24px; right: 24px; max-height: calc(100dvh - 48px - 56px); }
+}
+
+/* the bar has one tab fewer: 3 columns */
+@media (max-width: 768px) {
+  .bottom-nav { grid-template-columns: repeat(3, 1fr); }
+}

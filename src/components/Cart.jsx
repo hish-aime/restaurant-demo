@@ -8,14 +8,19 @@ export default function Cart({ cart, open, onClose, onChangeQuantity, onPickDish
   const tax = subtotal * 0.10;
   const total = subtotal + tax;
   const suggestions = suggestionsFor(cart);
+  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <aside className={`cart ${open ? "cart--open" : ""}`}>
+    <aside className={`cart ${open ? "cart--open" : ""}`} aria-label="Ma commande">
       <div className="cart-header">
-        <h2>Ma commande</h2>
+        <h2>
+          Ma commande
+          {cart.length > 0 && <small className="cart-header-count">{count} article{count > 1 ? "s" : ""}</small>}
+        </h2>
         <button className="cart-close" aria-label="Fermer le panier" onClick={onClose}>✕</button>
       </div>
 
+      <div className="cart-body">
       {cart.length === 0 ? (
         <p className="cart-empty">
           <span aria-hidden="true">🛒</span>
@@ -66,6 +71,9 @@ export default function Cart({ cart, open, onClose, onChangeQuantity, onPickDish
         </div>
       )}
 
+      </div>
+
+      <div className="cart-footer">
       <div className="cart-totals">
         <div className="cart-totals-row">
           <span>Sous-total</span>
@@ -88,6 +96,7 @@ export default function Cart({ cart, open, onClose, onChangeQuantity, onPickDish
       >
         Commander
       </button>
+      </div>
     </aside>
   );
 }

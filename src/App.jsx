@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { dishes, HOME, MENUS } from "./data";
 import Menu from "./components/Menu";
 import Cart from "./components/Cart";
@@ -44,6 +44,8 @@ export default function App() {
   }
 
   function changeQuantity(lineKey, delta) {
+    // removing the last product closes the cart window
+    if (cart.length === 1 && cart[0].lineKey === lineKey && cart[0].quantity + delta <= 0) setShowCart(false);
     setCart((prev) =>
       prev
         .map((item) => (item.lineKey === lineKey ? { ...item, quantity: item.quantity + delta } : item))
@@ -57,7 +59,13 @@ export default function App() {
   }
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  useEffect(() => {
+    if (!showCart) return;
+    const onKey = (e) => e.key === "Escape" && setShowCart(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showCart]);
 
   return (
     <div className="app">
@@ -120,10 +128,20 @@ export default function App() {
         onHome={() => goTo(HOME)}
         onMenus={() => goTo(MENUS)}
         onSearch={() => setShowSearch(true)}
-        onCart={() => setShowCart(true)}
-        cartCount={cartCount}
-        cartTotal={cartSubtotal}
       />
+
+      {/* Phones and tablets: the cart is a chat-style bubble, shown once something is in it */}
+      {cartCount > 0 && !showCart && (
+        <button
+          key={cartCount}
+          className="cart-fab"
+          aria-label={`Ouvrir le panier : ${cartCount} article${cartCount > 1 ? "s" : ""}`}
+          onClick={() => setShowCart(true)}
+        >
+          <span aria-hidden="true">🛒</span>
+          <span className="cart-fab-count">{cartCount}</span>
+        </button>
+      )}
 
       {showSearch && (
         <SearchOverlay
