@@ -3,9 +3,9 @@ const file = (name) => `${import.meta.env.BASE_URL}photos/${name}`;
 
 const PRODUCTS = {
   "Mini Mixte": "buckets-bucketsolo.webp",
-  "Box Tenders": "buckets-bucketduo.webp",
-  "Box Wings": "buckets-bucketduo.webp",
-  "Box Family": "buckets-bucket4.webp",
+  "Box Tenders": "buckets-duo-sides.webp",
+  "Box Wings": "buckets-duo-sides.webp",
+  "Box Family": "buckets-family-sides.webp",
   "Menu sandwich kebab": "burger-pain-pita-kebab.webp",
   "Menu sandwich le blindé": "burger-pain-pita-blinde.webp",
   "Menu sandwich classique": "burger-pain-pita-classiq.webp",
