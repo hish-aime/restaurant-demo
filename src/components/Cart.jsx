@@ -90,8 +90,14 @@ export default function Cart({ cart, open, onClose, onCancel, onChangeQuantity, 
       </div>
 
       <div className="cart-actions">
-        <button className="cancel-btn" disabled={cart.length === 0} onClick={onCancel}>
-          Annuler
+        <button
+          className="cancel-btn"
+          aria-label="Annuler la commande"
+          title="Annuler la commande"
+          disabled={cart.length === 0}
+          onClick={onCancel}
+        >
+          <span aria-hidden="true">🗑</span>
         </button>
         <button
           className="checkout-btn"
