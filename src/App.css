@@ -3243,3 +3243,15 @@ button.cart-badge-wrapper:hover { background: var(--brand-hover); }
   .cart-actions .checkout-btn { padding: 13px; }
   .cancel-btn { width: 46px; height: 46px; }
 }
+
+/* Panier : « Commander » en jaune, la corbeille en rouge */
+.cart-actions .checkout-btn:not(:disabled) {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.cart-actions .checkout-btn:hover:not(:disabled) { background: var(--accent-hover); }
+
+.cancel-btn:not(:disabled) { border-color: var(--brand); background: var(--brand); }
+.cancel-btn:not(:disabled):hover { border-color: var(--brand-hover); background: var(--brand-hover); }
+.cancel-btn:not(:disabled) span { font-size: 1.35rem; line-height: 1; filter: brightness(0) invert(1); }
